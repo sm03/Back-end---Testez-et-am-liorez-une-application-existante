@@ -15,14 +15,14 @@ logging:
   level:
     org:
       hibernate:
-        type: info
+        type: debug
       springframework:
         web:
           filter:
-            CommonsRequestLoggingFilter: info
+            CommonsRequestLoggingFilter: debug
     com:
       openclassrooms:
-        etudiant: info
+        etudiant: debug
 
 management:
   endpoints:
