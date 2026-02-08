@@ -1,16 +1,21 @@
 package com.openclassrooms.etudiant.controller;
 
+import com.google.gson.JsonObject;
 import com.openclassrooms.etudiant.dto.LoginRequestDTO;
 import com.openclassrooms.etudiant.dto.RegisterDTO;
 import com.openclassrooms.etudiant.mapper.UserDtoMapper;
+import com.openclassrooms.etudiant.service.JwtService;
 import com.openclassrooms.etudiant.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,8 +35,16 @@ public class UserController {
     @PostMapping("/api/login")
     public ResponseEntity<?> login(LoginRequestDTO loginRequestDTO) {
         String jwtToken = userService.login(loginRequestDTO.getLogin(), loginRequestDTO.getPassword());
-        return ResponseEntity.ok(jwtToken);
-    }
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_TYPE, "application/json");
+        headers.set(HttpHeaders.CACHE_CONTROL, "no-store");
+        headers.set(HttpHeaders.PRAGMA, "no-cache");
+        
+        String responseBody = "{\"access_token\": \"" + jwtToken + 
+            "\", \"token_type\": \"Bearer\", \"expires_in\": " + JwtService.getExpirationSeconds() + "}";
+
+        return new ResponseEntity<>(responseBody, headers, HttpStatus.OK);
+    }
 
 }

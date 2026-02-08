@@ -24,6 +24,14 @@ public class JwtService {
 
     private static final long EXPIRATION_MS = 1000 * 60 * 60; // 1 heure
 
+    public static long getExpirationMs() {
+        return EXPIRATION_MS;
+    }
+
+    public static long getExpirationSeconds() {
+        return EXPIRATION_MS / 1000; // Convertir en secondes
+    }
+
     public String generateToken(UserDetails userDetails) {      
         return io.jsonwebtoken.Jwts.builder()
                 .setSubject(userDetails.getUsername())
