@@ -1,4 +1,4 @@
-package com.openclassrooms.etudiant.service;
+package com.openclassrooms.etudiant.configuration.security;
 
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,6 +8,8 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
@@ -39,6 +41,26 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    // Méthode ajoutée pour le CRUD sécurisé étudiant
+    public String extractUsername(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+
+    // Méthode ajoutée pour le CRUD sécurisé étudiant
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    // Méthode ajoutée pour le CRUD sécurisé étudiant
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return username.equals(userDetails.getUsername());
     }
 
 }

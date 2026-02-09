@@ -121,6 +121,103 @@ mvn clean test
     - API d'authentification d'un utilisateur (à faire)
     - APIs CRUD des étudiants de la bibliothèque (à faire)
 
+## Tests des API avec Postman
+
+    Postman est disponible en tant qu'extension VSCode (recommandé)
+    Créer une API Collection avec les requêtes suivantes:
+
+    - API de création d'un utilisateur (agent de la bibliothèque)
+        POST    http://localhost:8080/api/register
+        Body (JSON) {
+                "firstName": "Ivan",
+                "lastName": "Velikopolski",
+                "login": "ivelikopolski",
+                "password": "ivelikopolski"
+            }
+        Réponse : Status 201 Created
+
+    - API d'authentification d'un utilisateur
+        POST http://localhost:8080/api/login
+        Params 
+            - login: ivelikopolski
+            - password: ivelikopolski
+        L'URL devient alors http://localhost:8080/api/login?login=ivelikopolski&password=ivelikopolski
+        Réponse : Status 200 OK
+        Body (JSON) {
+                "access_token": "eyJhbGciOiJIUzI1NiJ9. (...)", 
+                "token_type": "Bearer", 
+                "expires_in": 3600
+            }
+
+    - APIs CRUD sécurisées des étudiants de la bibliothèque
+        
+        Cf. StudentController.java
+
+        Spécifier pour chaque type de requête le JWT (non expiré!)
+        Authorization:
+            Bearer token: eyJhbGciOiJIUzI1NiJ9. (...)
+
+        Requête liste des étudiants
+        GET http://localhost:8080/api/students
+        Réponse: Status 200 OK
+        Body (JSON) Tableau vide si aucun étudiant créé
+
+        Requête créer un étudiant
+        POST http://localhost:8080/api/students
+        Body (JSON) {
+                "firstName": "Ivan",
+                "lastName": "Velikopolski",
+                "email": "ivelikopolski@gmail.com"
+            }
+        Réponse: Status 200 OK
+        Body (JSON) {
+            "id": 1,
+            "firstName": "Ivan",
+            "lastName": "Velikopolski",
+            "email": "ivelikopolski@gmail.com",
+            "phone": null
+        }
+
+        Requête pour obtenir les détails sur un étudiant
+        Exemple id = 1
+        GET http://localhost:8080/api/students/1
+        Réponse: Status 200 OK
+        {"id":1,"firstName":"Ivan","lastName":"Velikopolski","email":"ivelikopolski@gmail.com","phone":null}
+        
+        Requête pour modifier un étudiant
+        Les champs firstName, lastName et email ne peuvent être nuls
+        Exemple id = 1
+        PUT http://localhost:8080/api/students/1
+                Body (JSON) {
+                "firstName": "Ivan",
+                "lastName": "Velikopolski",
+                "email": "ivelikopolski@gmail.com",
+                "phone": "+7911123456"
+            }
+        Réponse: Status 200 OK
+        Body (JSON) {
+            "id": 1,
+            "firstName": "Ivan",
+            "lastName": "Velikopolski",
+            "email": "ivelikopolski@gmail.com",
+            "phone": "+7911123456"
+        }
+
+
+## Table des étudiants créée suite à implémentation CRUD
+
+```
+mysql> describe students;
++------------+--------------+------+-----+---------+----------------+
+| Field      | Type         | Null | Key | Default | Extra          |
++------------+--------------+------+-----+---------+----------------+
+| id         | bigint       | NO   | PRI | NULL    | auto_increment |
+| email      | varchar(255) | NO   | UNI | NULL    |                |
+| first_name | varchar(255) | NO   |     | NULL    |                |
+| last_name  | varchar(255) | NO   |     | NULL    |                |
+| phone      | varchar(255) | YES  |     | NULL    |                |
++------------+--------------+------+-----+---------+----------------+
+```
 
 ## Écrans ou blocs concernés
     - Ecran xxx
