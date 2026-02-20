@@ -28,5 +28,19 @@ public class StudentRequestDTO { // Création ou mise à jour d'un étudiant
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+
+    static public StudentRequestDTO buildRequestDTO(
+        String firstName,
+        String lastName,
+        String email,
+        String phone
+    ) {
+        var studentRequestDTO = new StudentRequestDTO();
+        studentRequestDTO.setFirstName(firstName);
+        studentRequestDTO.setLastName(lastName);
+        studentRequestDTO.setEmail(email);
+        studentRequestDTO.setPhone(phone);
+        return studentRequestDTO;
+    }
 }
 

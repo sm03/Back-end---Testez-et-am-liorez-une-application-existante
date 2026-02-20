@@ -30,6 +30,15 @@ public class Student {
         this.phone = phone;
     }
 
+    // Constructor with ID for testing purposes
+    public Student(String firstName, String lastName, String email, String phone, Long id) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.id = id;
+    }
+
     public Long getId() { return id; }
 
     public String getFirstName() { return firstName; }
