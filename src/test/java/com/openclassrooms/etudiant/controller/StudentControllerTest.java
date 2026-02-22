@@ -2,14 +2,10 @@ package com.openclassrooms.etudiant.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.etudiant.dto.StudentRequestDTO;
-import com.openclassrooms.etudiant.dto.StudentResponseDTO;
 import com.openclassrooms.etudiant.entities.Student;
 import com.openclassrooms.etudiant.entities.User;
 import com.openclassrooms.etudiant.repository.StudentRepository;
 import com.openclassrooms.etudiant.service.UserService;
-import com.openclassrooms.etudiant.service.impl.StudentServiceImpl;
-
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.AfterEach;
@@ -22,26 +18,23 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -133,7 +126,7 @@ class StudentControllerTest {
     }
 
     @Test
-    void createStudent_withoutToken_shouldBeUnauthorized() throws Exception {
+    void createStudent_withoutToken_sdoFilterInternalhouldBeUnauthorized() throws Exception {
 
         // Given
         StudentRequestDTO requestDTO = StudentRequestDTO.buildRequestDTO(

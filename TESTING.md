@@ -63,6 +63,7 @@ Les tests initiaux ont pour objet la méthode register:
 Les tests suivants ont été ajoutés pour tester la méthode login:
 - login_shouldReturnJwtToken_whenCredentialsValid
 - login_shouldReturnUnauthorized_whenInvalidCredentials
+- login_shouldReturnForbidden_whenUserNotFound
 
 La couverture de test pour UserController passe alors à 100%.
 
@@ -96,5 +97,30 @@ Un User est créé avant tout (bibliothécaire) qui se loggue avant chaque test 
 - deleteStudent_shouldReturn500_whenNotFound
 
 La couverture de test pour StudentController est de 100%.
+
+**JwtServiceTest**
+
+Test ajouté afin de passer la couverture de test de JwtService à 100%:
+- testExpirationTimes
+
+**UserTest**
+
+Tests ajoutés afin de passer la couverture de test de User à 100%:
+- testGetters
+- testUserDetailsMethods
+
+**LoginRequestDTOTest**
+
+Test ajouté afin de passer la couverture de LoginRequestDTO à 100%:
+- testGettersAndSetters
+
+**RegisterDTOTest**
+
+Test ajouté afin de passer la couverture de RequestDTO à 100%:
+- testGettersAndSetters
+
+
+
+
 
 

@@ -13,5 +13,4 @@ public class RegisterDTO {
     private String login;
     @NotBlank
     private String password;
-
 }

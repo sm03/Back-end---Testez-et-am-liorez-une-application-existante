@@ -8,7 +8,6 @@ import com.openclassrooms.etudiant.repository.UserRepository;
 import com.openclassrooms.etudiant.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,10 +16,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -44,8 +48,7 @@ public class UserControllerTest {
     private static final String LOGIN = "LOGIN";
     private static final String PASSWORD = "PASSWORD";
     private static final String WRONG_PASSWORD = "WRONG_PASSWORD";
-    private static final String JWT_TOKEN = "JWT_TOKEN";
-
+    
     @Container // mysql:latest (9.0) non compatible avec testcontainers 2.0.3 (erreur innodb_log_file_size=5M)
     @ServiceConnection // à la place de @DynamicPropertySource pour injecter les propriétés de connexion à la base de données
     static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.0");
@@ -112,7 +115,8 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException));
     }
 
     @Test
@@ -213,9 +217,37 @@ public class UserControllerTest {
             .param("password", loginRequestDTO.getPassword())
             .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .andExpect(MockMvcResultMatchers.status().isBadRequest())
+            .andExpect(MockMvcResultMatchers.status().isUnauthorized())
             .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Invalid credentials"));
+            .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Invalid credentials"))
+            .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadCredentialsException))
+            ;
     }
 
+    @Test
+    public void login_shouldReturnForbidden_whenUserNotFound() throws Exception {
+        // GIVEN
+        LoginRequestDTO loginRequestDTO = new LoginRequestDTO();
+        loginRequestDTO.setLogin(LOGIN);
+        loginRequestDTO.setPassword(PASSWORD);
+  
+        User user = new User();
+        user.setFirstName(FIRST_NAME);
+        user.setLastName(LAST_NAME);
+        user.setLogin(LOGIN);
+        user.setPassword(PASSWORD);
+
+        // Utilisateur non enregistré dans la base de données donc login impossible
+
+        // THEN
+        mockMvc.perform(MockMvcRequestBuilders.post(LOGIN_URL)
+            .param("login", loginRequestDTO.getLogin())
+            .param("password", loginRequestDTO.getPassword())
+            .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(MockMvcResultMatchers.status().isForbidden()) 
+            .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+            .andExpect(result -> assertTrue(result.getResolvedException() instanceof AccessDeniedException))
+            ;
+    }
 }

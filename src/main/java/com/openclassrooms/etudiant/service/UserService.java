@@ -6,11 +6,13 @@ import com.openclassrooms.etudiant.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
 import java.util.Optional;
 
 @Slf4j
@@ -47,8 +49,10 @@ public class UserService {
                     .build();
             log.info("Building user details...");
             return jwtService.generateToken(userDetails);
+        } else if (user.isEmpty()) {
+            throw new AccessDeniedException("User not found");
         } else {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new BadCredentialsException("Invalid credentials");
         }
     }
 

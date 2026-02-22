@@ -9,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -139,7 +141,7 @@ public class UserServiceTest {
 
         // WHEN + THEN
         assertThatThrownBy(() -> userService.login(LOGIN, WRONG_PASSWORD))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BadCredentialsException.class)
                 .hasMessage("Invalid credentials");
 
         verify(jwtService, never()).generateToken(any());
@@ -152,8 +154,8 @@ public class UserServiceTest {
 
         // WHEN + THEN
         assertThatThrownBy(() -> userService.login(LOGIN, PASSWORD))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Invalid credentials");
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessage("User not found");
 
         verify(jwtService, never()).generateToken(any());
     }

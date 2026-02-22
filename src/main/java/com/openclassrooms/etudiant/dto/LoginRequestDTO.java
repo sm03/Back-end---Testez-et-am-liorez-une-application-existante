@@ -9,5 +9,4 @@ public class LoginRequestDTO {
     private String login;
     @NotBlank
     private String password;
-
 }
