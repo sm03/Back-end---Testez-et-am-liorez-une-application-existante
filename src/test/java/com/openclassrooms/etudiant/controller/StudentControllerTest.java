@@ -126,7 +126,7 @@ class StudentControllerTest {
     }
 
     @Test
-    void createStudent_withoutToken_sdoFilterInternalhouldBeUnauthorized() throws Exception {
+    void createStudent_withoutToken_shouldBeUnauthorized() throws Exception {
 
         // Given
         StudentRequestDTO requestDTO = StudentRequestDTO.buildRequestDTO(
